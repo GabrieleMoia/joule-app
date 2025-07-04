@@ -3,3 +3,4 @@
 *.xcuserstate
 *.plist
 *.DS_Store
+*.resolved
