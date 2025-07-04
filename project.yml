@@ -1,0 +1,240 @@
+name: joule
+options:
+  postGenCommand: "open joule.xcodeproj"
+  developmentLanguage: it
+  generateEmptyDirectories: true
+  groupOrdering:
+    - order: [App, UnitTest, UITest]
+    - pattern: 'App'
+      order: [Flows, Dependencies, Services, Mock, Screens, Models, Enums, Extensions, Utils, Resources]
+    - pattern: 'Mock'
+      order: [Scenarios, Services, Assets]
+      
+configs:
+  Mock Debug: debug
+  Mock Release: release
+  Staging Debug: debug
+  Staging Release: release
+  Production Debug: debug
+  Production Release: release
+
+packages:
+  joule-uikit:
+    url: https://github.com/GabrieleMoia/joule-uikit.git
+    branch: develop
+    #from: 1.23.1
+targets:
+  joule:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+        excludes:
+          - "Resources/exportOptions.plist"
+    deploymentTarget:
+      iOS: 18.0
+    settings:
+      base:
+        ASSETCATALOG_COMPILER_APPICON_NAME: "AppIcon"
+        PRODUCT_NAME: joule
+        GENERATE_INFOPLIST_FILE: false
+        TARGETED_DEVICE_FAMILY: 1
+        OTHER_LDFLAGS: "-ObjC"
+        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: 1.0.0
+        COPY_PHASE_STRIP: true
+        GENERATED_ASSET_SYMBOL_EXTENSIONS: true
+      configs:
+        Mock Debug:
+          SCHEME_NAME: "Mock"
+          PRODUCT_BUNDLE_IDENTIFIER: it.joule.mock
+          BUNDLE_DISPLAY_NAME: "joule Mock"
+          ENABLE_TESTABILITY: true
+          ENABLE_TESTING_SEARCH_PATHS: true
+          CODE_SIGN_INJECT_BASE_ENTITLEMENTS: true
+          SWIFT_OPTIMIZATION_LEVEL: '-Onone'
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS:
+            - "MOCK"
+            - "DEBUG"
+          BUILD_ACTIVE_ARCHITECTURE_ONLY: true
+        Mock Release:
+          SCHEME_NAME: "Mock"
+          PRODUCT_BUNDLE_IDENTIFIER: it.joule.mock
+          BUNDLE_DISPLAY_NAME: "joule Mock"
+          ENABLE_TESTABILITY: false
+          ENABLE_TESTING_SEARCH_PATHS: false
+          CODE_SIGN_INJECT_BASE_ENTITLEMENTS: false
+          SWIFT_OPTIMIZATION_LEVEL: '-O'
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS:
+            - "MOCK"
+            - "RELEASE"
+          BUILD_ACTIVE_ARCHITECTURE_ONLY: false
+        Staging Debug:
+          SCHEME_NAME: "Staging"
+          PRODUCT_BUNDLE_IDENTIFIER: it.joule.staging
+          BUNDLE_DISPLAY_NAME: "joule Staging"
+          ENABLE_TESTABILITY: false
+          ENABLE_TESTING_SEARCH_PATHS: false
+          EXCLUDED_SOURCE_FILE_NAMES: "App/Mock/*"
+          CODE_SIGN_INJECT_BASE_ENTITLEMENTS: true
+          SWIFT_OPTIMIZATION_LEVEL: '-Onone'
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS:
+            - "STAGING"
+            - "DEBUG"
+          BUILD_ACTIVE_ARCHITECTURE_ONLY: true
+        Staging Release:
+          SCHEME_NAME: "Staging"
+          PRODUCT_BUNDLE_IDENTIFIER: it.joule.staging
+          BUNDLE_DISPLAY_NAME: "joule Staging"
+          ENABLE_TESTABILITY: false
+          ENABLE_TESTING_SEARCH_PATHS: false
+          EXCLUDED_SOURCE_FILE_NAMES: "App/Mock/*"
+          CODE_SIGN_INJECT_BASE_ENTITLEMENTS: false
+          SWIFT_OPTIMIZATION_LEVEL: '-O'
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS:
+            - "STAGING"
+            - "RELEASE"
+          BUILD_ACTIVE_ARCHITECTURE_ONLY: false
+        Production Debug:
+          SCHEME_NAME: "Production"
+          PRODUCT_BUNDLE_IDENTIFIER: it.joule
+          BUNDLE_DISPLAY_NAME: "joule"
+          ENABLE_TESTABILITY: false
+          ENABLE_TESTING_SEARCH_PATHS: false
+          EXCLUDED_SOURCE_FILE_NAMES: "App/Mock/*"
+          CODE_SIGN_INJECT_BASE_ENTITLEMENTS: false
+          SWIFT_OPTIMIZATION_LEVEL: '-Onone'
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS:
+            - "PRODUCTION"
+            - "DEBUG"
+          BUILD_ACTIVE_ARCHITECTURE_ONLY: true
+        Production Release:
+          SCHEME_NAME: "Production"
+          PRODUCT_BUNDLE_IDENTIFIER: it.joule
+          BUNDLE_DISPLAY_NAME: "joule"
+          ENABLE_TESTABILITY: false
+          ENABLE_TESTING_SEARCH_PATHS: false
+          EXCLUDED_SOURCE_FILE_NAMES: "App/Mock/*"
+          CODE_SIGN_INJECT_BASE_ENTITLEMENTS: false
+          SWIFT_OPTIMIZATION_LEVEL: '-O'
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS:
+            - "PRODUCTION"
+            - "RELEASE"
+          BUILD_ACTIVE_ARCHITECTURE_ONLY: false
+    dependencies:
+      - package: joule-uikit
+    info:
+      path: "./App/Resources/Info.plist"
+      properties:
+        UILaunchScreen:
+          UIColorName: ""
+        CFBundleDisplayName: $(BUNDLE_DISPLAY_NAME)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundlePackageType: $(PRODUCT_BUNDLE_PACKAGE_TYPE)
+        UIUserInterfaceStyle: Light
+        ITSAppUsesNonExemptEncryption: false
+#    postBuildScripts:
+#      - path: .Scripts/Development/swiftformat.sh
+#        name: Format code
+#        basedOnDependencyAnalysis: false
+
+  joule-test:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: UnitTests
+    dependencies:
+      - target: joule
+    settings:
+      base:
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/iliad.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/joule
+        BUNDLE_LOADER: $(TEST_HOST)
+        PRODUCT_NAME: jouleTests
+        PRODUCT_BUNDLE_IDENTIFIER: it.joule.unitTests
+        GENERATE_INFOPLIST_FILE: true
+        ENABLE_USER_SCRIPT_SANDBOXING: true
+      configs:
+        Mock Debug:
+          ENABLE_TESTABILITY: true
+          ONLY_ACTIVE_ARCH: true
+          VALIDATE_PRODUCT: false
+          SWIFT_OPTIMIZATION_LEVEL: '-Onone'
+        Mock Release:
+          ENABLE_TESTABILITY: false
+          ONLY_ACTIVE_ARCH: false
+          VALIDATE_PRODUCT: true
+          SWIFT_OPTIMIZATION_LEVEL: '-O'
+        Staging Debug:
+          ENABLE_TESTABILITY: false
+          ONLY_ACTIVE_ARCH: true
+          VALIDATE_PRODUCT: false
+          SWIFT_OPTIMIZATION_LEVEL: '-Onone'
+        Staging Release:
+          ENABLE_TESTABILITY: false
+          ONLY_ACTIVE_ARCH: false
+          VALIDATE_PRODUCT: true
+          SWIFT_OPTIMIZATION_LEVEL: '-O'
+        Production Debug:
+          ENABLE_TESTABILITY: false
+          ONLY_ACTIVE_ARCH: true
+          VALIDATE_PRODUCT: false
+          SWIFT_OPTIMIZATION_LEVEL: '-Onone'
+        Production Release:
+          ENABLE_TESTABILITY: false
+          ONLY_ACTIVE_ARCH: false
+          VALIDATE_PRODUCT: true
+          SWIFT_OPTIMIZATION_LEVEL: '-O'
+
+schemes:
+  Mock:
+    build:
+      targets:
+        joule: all
+    run:
+      config: Mock Debug
+    test:
+      config: Mock Debug
+      testPlans:
+        - path: UnitTests/UnitTestPlan.xctestplan
+    profile:
+      config: Mock Release
+    analyze:
+      config: Mock Debug
+    archive:
+      config: Mock Release
+
+  Staging:
+    build:
+      targets:
+        joule: all
+    run:
+      config: Staging Debug
+      commandLineArguments:
+        -FIRAnalyticsDebugEnabled: false
+        -FIRDebugEnabled: false
+    test:
+      config: Staging Debug
+    profile:
+      config: Staging Release
+    analyze:
+      config: Staging Debug
+    archive:
+      config: Staging Release
+
+  Production:
+    build:
+      targets:
+        joule: all
+    run:
+      config: Production Debug
+#      executable: "none"
+    test:
+      config: Production Debug
+    profile:
+      config: Production Release
+      executable: "none"
+    analyze:
+      config: Production Debug
+    archive:
+      config: Production Release

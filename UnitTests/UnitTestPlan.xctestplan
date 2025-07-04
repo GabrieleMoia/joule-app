@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "60A66946-DC82-4F62-A54E-1D13BA70F083",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:joule.xcodeproj",
+        "identifier" : "410E5DB35B40E9C51A6CAA6E",
+        "name" : "joule-test"
+      }
+    }
+  ],
+  "version" : 1
+}
